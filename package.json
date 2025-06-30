@@ -3,44 +3,23 @@
   "version": "1.0.0",
   "description": "AI Workflow Automation Platform - Democratizing AI automation for business users",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "dev:web": "npm run dev --workspace=apps/web",
-    "dev:api": "npm run dev --workspace=apps/api",
-    "dev:backend": "npm run dev:api",
-    "lint": "turbo run lint",
-    "lint:fix": "turbo run lint:fix",
-    "test": "turbo run test",
-    "test:e2e": "turbo run test:e2e",
-    "type-check": "turbo run type-check",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "db:migrate": "npm run migrate --workspace=apps/api",
-    "db:seed": "npm run seed --workspace=apps/api",
-    "db:reset": "npm run db:migrate && npm run db:seed",
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:api": "cd apps/api && npm run dev",
+    "build": "npm run build:shared && npm run build:web && npm run build:api",
+    "build:shared": "cd packages/shared && npm run build",
+    "build:web": "cd apps/web && npm run build",
+    "build:api": "cd apps/api && npm run build",
+    "install:all": "npm install && cd packages/shared && npm install && cd ../../apps/web && npm install && cd ../api && npm install",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "prepare": "husky install"
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "@typescript-eslint/eslint-plugin": "^6.13.0",
-    "@typescript-eslint/parser": "^6.13.0",
-    "eslint": "^8.54.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.2.0",
-    "prettier": "^3.1.0",
-    "turbo": "^1.10.16",
+    "concurrently": "^8.2.2",
     "typescript": "^5.3.2"
   },
   "engines": {
@@ -57,22 +36,5 @@
     "saas"
   ],
   "author": "FlowForge Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/flowforge/flowforge.git"
-  },
-  "bugs": {
-    "url": "https://github.com/flowforge/flowforge/issues"
-  },
-  "homepage": "https://flowforge.ai",
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
-  }
+  "license": "MIT"
 }

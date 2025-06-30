@@ -147,7 +147,7 @@ export const WorkflowSchema = z.object({
     lastModified: z.string().datetime(),
     executionCount: z.number().default(0),
     averageExecutionTime: z.number().default(0),
-  }).default({}),
+  }),
 });
 
 export type Workflow = z.infer<typeof WorkflowSchema>;
@@ -175,7 +175,7 @@ export const WorkflowExecutionSchema = z.object({
     retryCount: z.number().default(0),
   })),
   error: z.string().optional(),
-  metadata: z.record(z.any()).default({}),
+  metadata: z.record(z.any()).optional(),
 });
 
 export type WorkflowExecution = z.infer<typeof WorkflowExecutionSchema>;
