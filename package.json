@@ -36,5 +36,10 @@
     "saas"
   ],
   "author": "FlowForge Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@types/uuid": "^10.0.0",
+    "reactflow": "^11.11.4",
+    "uuid": "^11.1.0"
+  }
 }
