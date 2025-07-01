@@ -77,30 +77,36 @@ export default function HomePage() {
                   <div className="mt-5 sm:mt-8 space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                       <a
-                        href="/builder/advanced"
-                        className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 md:py-4 md:text-lg md:px-10 shadow-lg"
+                        href="/generate"
+                        className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 md:py-4 md:text-lg md:px-10 shadow-lg"
                       >
-                        🚀 Advanced Builder
+                        🤖 Generate with AI
                       </a>
                       <a
                         href="/builder/interactive"
-                        className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                        className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 md:py-4 md:text-lg md:px-10 shadow-lg"
                       >
-                        Interactive Builder
+                        🚀 Interactive Builder
                       </a>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                       <a
+                        href="/builder/advanced"
+                        className="flex items-center justify-center px-6 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        ⚡ Advanced Builder
+                      </a>
+                      <a
+                        href="/analytics"
+                        className="flex items-center justify-center px-6 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        📊 Analytics Dashboard
+                      </a>
+                      <a
                         href="/workflows"
                         className="flex items-center justify-center px-6 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                       >
-                        📊 Workflows Dashboard
-                      </a>
-                      <a
-                        href="/builder"
-                        className="flex items-center justify-center px-6 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                      >
-                        🎨 Demo Builder
+                        📋 Workflows
                       </a>
                     </div>
                   </div>
