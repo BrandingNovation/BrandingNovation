@@ -74,21 +74,33 @@ export default function HomePage() {
                     Democratize AI automation by making enterprise-grade workflows accessible to every business user. 
                     Build sophisticated automation pipelines without coding.
                   </p>
-                  <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                    <div className="rounded-md shadow">
+                  <div className="mt-5 sm:mt-8 space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                      <a
+                        href="/builder/advanced"
+                        className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 md:py-4 md:text-lg md:px-10 shadow-lg"
+                      >
+                        🚀 Advanced Builder
+                      </a>
                       <a
                         href="/builder/interactive"
-                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                        className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
                       >
                         Interactive Builder
                       </a>
                     </div>
-                    <div className="mt-3 sm:mt-0 sm:ml-3">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                      <a
+                        href="/workflows"
+                        className="flex items-center justify-center px-6 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        📊 Workflows Dashboard
+                      </a>
                       <a
                         href="/builder"
-                        className="w-full flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
+                        className="flex items-center justify-center px-6 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                       >
-                        Demo Builder
+                        🎨 Demo Builder
                       </a>
                     </div>
                   </div>
