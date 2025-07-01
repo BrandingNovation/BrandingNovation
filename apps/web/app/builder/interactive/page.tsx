@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -16,6 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { v4 as uuidv4 } from 'uuid';
+import { useAPI, workflowUtils, WorkflowData } from '../../../lib/api';
 
 // Custom Node Components
 const TriggerNode = ({ data, selected }: any) => (
@@ -163,6 +164,10 @@ export default function InteractiveBuilderPage() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowData | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const api = useAPI();
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds: Edge[]) => addEdge(params, eds)),
@@ -217,19 +222,76 @@ export default function InteractiveBuilderPage() {
     setIsRunning(false);
   };
 
-  const saveWorkflow = () => {
-    const workflow = {
-      nodes,
-      edges,
-      metadata: {
-        name: 'Customer Onboarding Flow',
-        created: new Date().toISOString(),
-        nodeCount: nodes.length,
-        edgeCount: edges.length
+  const saveWorkflow = async () => {
+    if (!currentWorkflow) {
+      // Create new workflow first
+      await createNewWorkflow();
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveStatus('saving');
+
+    try {
+      const result = await workflowUtils.saveWorkflowFromBuilder(
+        currentWorkflow.id,
+        nodes,
+        edges,
+        'Updated workflow via interactive builder'
+      );
+
+      if (result.error) {
+        throw new Error(result.error);
       }
-    };
-    console.log('Saving workflow:', workflow);
-    // Here you would send to your API
+
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+      console.log('Workflow saved successfully:', result.data);
+    } catch (error) {
+      console.error('Failed to save workflow:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const createNewWorkflow = async () => {
+    const name = prompt('Enter workflow name:', 'New Workflow');
+    if (!name) return;
+
+    const description = prompt('Enter workflow description (optional):', '');
+
+    setIsSaving(true);
+    setSaveStatus('saving');
+
+    try {
+      const result = await workflowUtils.createWorkflowFromBuilder(name, description || undefined);
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      setCurrentWorkflow(result.data!);
+      
+      // Now save the current canvas
+      await workflowUtils.saveWorkflowFromBuilder(
+        result.data!.id,
+        nodes,
+        edges,
+        'Initial workflow creation'
+      );
+
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+      console.log('New workflow created:', result.data);
+    } catch (error) {
+      console.error('Failed to create workflow:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -246,14 +308,31 @@ export default function InteractiveBuilderPage() {
             </a>
             <div className="text-sm text-gray-500">
               <span>Interactive Workflow Builder</span>
+              {currentWorkflow && (
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                  {currentWorkflow.name}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={saveWorkflow}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              disabled={isSaving}
+              className={`px-4 py-2 text-sm font-medium rounded-md border ${
+                isSaving
+                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  : saveStatus === 'saved'
+                  ? 'bg-green-50 text-green-700 border-green-200'
+                  : saveStatus === 'error'
+                  ? 'bg-red-50 text-red-700 border-red-200'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
             >
-              Save Workflow
+              {saveStatus === 'saving' && '💾 Saving...'}
+              {saveStatus === 'saved' && '✅ Saved'}
+              {saveStatus === 'error' && '❌ Error'}
+              {saveStatus === 'idle' && (currentWorkflow ? '💾 Save' : '➕ Create & Save')}
             </button>
             <button
               onClick={runWorkflow}
