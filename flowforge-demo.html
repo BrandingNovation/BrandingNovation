@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowForge - AI Workflow Automation Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            background: white;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: -20px -20px 30px -20px;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .section {
+            display: none;
+            padding: 20px 0;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .feature-desc {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .workflow-builder {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .node {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: white;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            transform: scale(1.05);
+        }
+
+        .node.trigger { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        .node.email { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .node.delay { background: linear-gradient(135deg, #feca57, #ff9ff3); }
+        .node.condition { background: linear-gradient(135deg, #48dbfb, #0abde3); }
+        .node.ai { background: linear-gradient(135deg, #ff9ff3, #f368e0); }
+
+        .workflow-demo {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .demo-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            margin: 15px 0;
+        }
+
+        .ai-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .workflow-result {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .execution-log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .step.completed { background: rgba(46, 204, 113, 0.2); }
+        .step.running { background: rgba(52, 152, 219, 0.2); animation: pulse 1s infinite; }
+        .step.pending { background: rgba(149, 165, 166, 0.2); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .analytics-chart {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .chart-bar {
+            display: inline-block;
+            width: 30px;
+            margin: 0 5px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px 15px 0 0;
+            vertical-align: bottom;
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .floating-action:hover {
+            transform: scale(1.1);
+        }
+
+        .mobile-optimized {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .header { margin: -10px -10px 20px -10px; }
+            .logo { font-size: 2em; }
+            .nav { flex-direction: column; }
+            .nav-item { width: 100%; text-align: center; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mobile-optimized">
+        <div class="header">
+            <div class="logo">🔥 FlowForge</div>
+            <div class="tagline">AI Workflow Automation Platform</div>
+        </div>
+
+        <div class="nav">
+            <button class="nav-item active" onclick="showSection('overview')">🏠 Overview</button>
+            <button class="nav-item" onclick="showSection('builder')">🔧 Builder</button>
+            <button class="nav-item" onclick="showSection('ai-gen')">🤖 AI Generator</button>
+            <button class="nav-item" onclick="showSection('analytics')">📊 Analytics</button>
+            <button class="nav-item" onclick="showSection('workflows')">📋 Workflows</button>
+            <button class="nav-item" onclick="showSection('monitor')">🔍 Monitor</button>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="section active">
+            <h2>🚀 Welcome to FlowForge</h2>
+            <p>The world's most advanced AI-powered workflow automation platform. Build, deploy, and scale enterprise-grade automation pipelines without writing a single line of code.</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">8,000+</span>
+                    <span class="stat-label">Monthly Active Users</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">75%</span>
+                    <span class="stat-label">30-Day Retention</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">$600K</span>
+                    <span class="stat-label">ARR Target</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">99.9%</span>
+                    <span class="stat-label">Uptime SLA</span>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🤖</span>
+                    <div class="feature-title">AI-Powered Generation</div>
+                    <div class="feature-desc">Transform natural language descriptions into production-ready workflows with GPT-4 and Claude integration.</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎨</span>
+                    <div class="feature-title">Visual Builder</div>
+                    <div class="feature-desc">Drag-and-drop interface with React Flow, featuring 13+ node types and real-time collaboration.</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <div class="feature-title">Real-Time Execution</div>
+                    <div class="feature-desc">Watch your workflows execute live with step-by-step monitoring and performance analytics.</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔗</span>
+                    <div class="feature-title">Enterprise Integrations</div>
+                    <div class="feature-desc">Connect with 500+ business tools including Salesforce, Slack, Google Workspace, and more.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Builder Section -->
+        <div id="builder" class="section">
+            <h2>🔧 Interactive Workflow Builder</h2>
+            <p>Professional drag-and-drop workflow builder with enterprise-grade features.</p>
+
+            <div class="workflow-builder">
+                <h3>Available Node Types</h3>
+                <div class="workflow-demo">
+                    <div class="node trigger" onclick="showToast('Trigger Node: Starts workflows based on events')">⚡ Trigger</div>
+                    <div class="node email" onclick="showToast('Email Node: Send personalized emails with AI templates')">📧 Email</div>
+                    <div class="node delay" onclick="showToast('Delay Node: Add intelligent timing to workflows')">⏰ Delay</div>
+                    <div class="node condition" onclick="showToast('Condition Node: Smart branching with AI logic')">🔀 Condition</div>
+                    <div class="node ai" onclick="showToast('AI Agent: GPT-4 powered intelligent processing')">🤖 AI Agent</div>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h3>🎯 Key Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px 0;">✅ Real-time collaborative editing</li>
+                    <li style="padding: 10px 0;">✅ SVG-based professional connections</li>
+                    <li style="padding: 10px 0;">✅ Minimap and zoom controls</li>
+                    <li style="padding: 10px 0;">✅ Auto-save with visual indicators</li>
+                    <li style="padding: 10px 0;">✅ Error detection and validation</li>
+                    <li style="padding: 10px 0;">✅ Live performance monitoring</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- AI Generator Section -->
+        <div id="ai-gen" class="section">
+            <h2>🤖 AI Workflow Generator</h2>
+            <p>Generate production-ready workflows from natural language descriptions using advanced AI.</p>
+
+            <div class="demo-section">
+                <h3>Describe Your Workflow</h3>
+                <textarea class="ai-input" placeholder="Example: When a new customer signs up, send them a welcome email, wait 24 hours, then check if they've completed onboarding. If not, send a follow-up email and notify the sales team." rows="4"></textarea>
+                <button class="generate-btn" onclick="generateWorkflow()">🚀 Generate Workflow with AI</button>
+
+                <div id="workflow-output" style="display: none;">
+                    <div class="workflow-result">
+                        <h4>✨ Generated Workflow: Customer Onboarding</h4>
+                        <div style="margin: 15px 0;">
+                            <div class="node trigger">📧 New Signup Trigger</div>
+                            <span style="margin: 0 10px;">→</span>
+                            <div class="node email">📧 Welcome Email</div>
+                            <span style="margin: 0 10px;">→</span>
+                            <div class="node delay">⏰ 24hr Delay</div>
+                            <span style="margin: 0 10px;">→</span>
+                            <div class="node condition">🔀 Onboarding Check</div>
+                            <span style="margin: 0 10px;">→</span>
+                            <div class="node ai">🤖 Follow-up & Notify</div>
+                        </div>
+                        <p><strong>Complexity:</strong> Medium | <strong>Estimated Runtime:</strong> 24-48 hours | <strong>Success Rate:</strong> 94%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🧠</span>
+                    <div class="feature-title">Smart Pattern Recognition</div>
+                    <div class="feature-desc">AI understands business processes and suggests optimal workflow patterns.</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <div class="feature-title">Instant Generation</div>
+                    <div class="feature-desc">From description to production-ready workflow in under 10 seconds.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics" class="section">
+            <h2>📊 Enterprise Analytics Dashboard</h2>
+            <p>Real-time performance monitoring and comprehensive workflow analytics.</p>
+
+            <div class="analytics-chart">
+                <h3>📈 Execution Trends (Last 7 Days)</h3>
+                <div style="margin: 20px 0;">
+                    <div class="chart-bar" style="height: 60px;"></div>
+                    <div class="chart-bar" style="height: 80px;"></div>
+                    <div class="chart-bar" style="height: 45px;"></div>
+                    <div class="chart-bar" style="height: 90px;"></div>
+                    <div class="chart-bar" style="height: 70px;"></div>
+                    <div class="chart-bar" style="height: 95px;"></div>
+                    <div class="chart-bar" style="height: 85px;"></div>
+                </div>
+                <p>📊 Average: 847 executions/day | 🚀 Peak: 1,247 executions | ⚡ 99.7% success rate</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">1,247</span>
+                    <span class="stat-label">Executions Today</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">847ms</span>
+                    <span class="stat-label">Avg Response Time</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">34</span>
+                    <span class="stat-label">Active Workflows</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">99.7%</span>
+                    <span class="stat-label">Success Rate</span>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h3>🎯 Top Performing Workflows</h3>
+                <div style="margin: 15px 0;">
+                    <div style="padding: 10px; margin: 5px 0; background: white; border-radius: 8px; border-left: 4px solid #2ecc71;">
+                        📧 <strong>Customer Onboarding</strong> - 1,247 executions (98.2% success)
+                    </div>
+                    <div style="padding: 10px; margin: 5px 0; background: white; border-radius: 8px; border-left: 4px solid #3498db;">
+                        🛍️ <strong>Order Processing</strong> - 892 executions (99.1% success)
+                    </div>
+                    <div style="padding: 10px; margin: 5px 0; background: white; border-radius: 8px; border-left: 4px solid #f39c12;">
+                        🎯 <strong>Lead Qualification</strong> - 634 executions (96.8% success)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflows Section -->
+        <div id="workflows" class="section">
+            <h2>📋 Workflow Management</h2>
+            <p>Manage, version, and deploy your automation workflows with enterprise-grade controls.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📧</span>
+                    <div class="feature-title">Customer Onboarding</div>
+                    <div class="feature-desc">
+                        <strong>Status:</strong> ✅ Active | <strong>Version:</strong> 2.1.4<br>
+                        <strong>Executions:</strong> 1,247 | <strong>Success Rate:</strong> 98.2%
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🛍️</span>
+                    <div class="feature-title">Order Processing</div>
+                    <div class="feature-desc">
+                        <strong>Status:</strong> ✅ Active | <strong>Version:</strong> 1.8.2<br>
+                        <strong>Executions:</strong> 892 | <strong>Success Rate:</strong> 99.1%
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎯</span>
+                    <div class="feature-title">Lead Qualification</div>
+                    <div class="feature-desc">
+                        <strong>Status:</strong> ✅ Active | <strong>Version:</strong> 3.0.1<br>
+                        <strong>Executions:</strong> 634 | <strong>Success Rate:</strong> 96.8%
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📞</span>
+                    <div class="feature-title">Support Ticket Routing</div>
+                    <div class="feature-desc">
+                        <strong>Status:</strong> 🟡 Testing | <strong>Version:</strong> 1.0.0-beta<br>
+                        <strong>Executions:</strong> 45 | <strong>Success Rate:</strong> 95.6%
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h3>🔧 Workflow Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px 0;">✅ Version control with Git-like branching</li>
+                    <li style="padding: 10px 0;">✅ A/B testing for workflow optimization</li>
+                    <li style="padding: 10px 0;">✅ Automated rollback on failures</li>
+                    <li style="padding: 10px 0;">✅ Environment promotion (Dev → Staging → Prod)</li>
+                    <li style="padding: 10px 0;">✅ Performance monitoring and alerting</li>
+                    <li style="padding: 10px 0;">✅ Team collaboration with role-based access</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Monitor Section -->
+        <div id="monitor" class="section">
+            <h2>🔍 Real-Time Execution Monitor</h2>
+            <p>Watch your workflows execute in real-time with step-by-step progress tracking.</p>
+
+            <div class="demo-section">
+                <h3>🔄 Live Execution: Customer Onboarding #12847</h3>
+                <div class="execution-log">
+                    <div class="step completed">✅ [12:34:15] Trigger: New customer signup detected (user@example.com)</div>
+                    <div class="step completed">✅ [12:34:16] Email: Welcome email sent successfully</div>
+                    <div class="step completed">✅ [12:34:17] Database: Customer record created in CRM</div>
+                    <div class="step running">🔄 [12:34:18] AI Agent: Analyzing user profile and preferences...</div>
+                    <div class="step pending">⏳ [Pending] Delay: Wait 24 hours for onboarding completion</div>
+                    <div class="step pending">⏳ [Pending] Condition: Check onboarding status</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">2.4s</span>
+                    <span class="stat-label">Current Runtime</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">4/6</span>
+                    <span class="stat-label">Steps Completed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">24h</span>
+                    <span class="stat-label">Est. Total Time</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">98%</span>
+                    <span class="stat-label">Success Probability</span>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🔍</span>
+                    <div class="feature-title">Step-by-Step Tracking</div>
+                    <div class="feature-desc">Monitor every step of your workflow execution with detailed logs and performance metrics.</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🚨</span>
+                    <div class="feature-title">Intelligent Alerting</div>
+                    <div class="feature-desc">Receive instant notifications when workflows fail or performance degrades.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="floating-action" onclick="showToast('FlowForge: Revolutionizing workflow automation!')" title="About FlowForge">💡</button>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.classList.add('active');
+            
+            // Show relevant toast
+            const messages = {
+                'overview': 'Welcome to FlowForge! 🚀',
+                'builder': 'Interactive Workflow Builder loaded! 🔧',
+                'ai-gen': 'AI Workflow Generator ready! 🤖',
+                'analytics': 'Enterprise Analytics Dashboard! 📊',
+                'workflows': 'Workflow Management Center! 📋',
+                'monitor': 'Real-time Execution Monitor! 🔍'
+            };
+            showToast(messages[sectionId]);
+        }
+
+        function generateWorkflow() {
+            const input = document.querySelector('.ai-input').value;
+            if (!input.trim()) {
+                showToast('Please describe your workflow first! 💭');
+                return;
+            }
+            
+            showToast('Generating workflow with AI... 🤖✨');
+            
+            setTimeout(() => {
+                document.getElementById('workflow-output').style.display = 'block';
+                showToast('Workflow generated successfully! 🎉');
+            }, 2000);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Auto-update execution monitor
+        setInterval(() => {
+            if (document.getElementById('monitor').classList.contains('active')) {
+                const runningStep = document.querySelector('.step.running');
+                if (runningStep && Math.random() > 0.7) {
+                    runningStep.classList.remove('running');
+                    runningStep.classList.add('completed');
+                    runningStep.innerHTML = runningStep.innerHTML.replace('🔄', '✅').replace('Analyzing user profile', 'User profile analyzed and personalization applied');
+                    
+                    const nextStep = runningStep.nextElementSibling;
+                    if (nextStep && nextStep.classList.contains('pending')) {
+                        nextStep.classList.remove('pending');
+                        nextStep.classList.add('running');
+                        nextStep.innerHTML = nextStep.innerHTML.replace('⏳ [Pending]', '🔄 [12:34:19]').replace('Wait 24 hours', 'Waiting 24 hours (23:59:42 remaining)');
+                    }
+                }
+            }
+        }, 5000);
+
+        // Show welcome message
+        setTimeout(() => {
+            showToast('🔥 Welcome to FlowForge - The Future of Workflow Automation!');
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -10,7 +10,11 @@ const nextConfig = {
   output: 'export',
   poweredByHeader: false,
   trailingSlash: true,
-  distDir: 'out',
+  distDir: 'dist',
+  experimental: {
+    // Disable React Server Components that cause issues with static export
+    esmExternals: false
+  }
 };
 
 module.exports = nextConfig;

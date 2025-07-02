@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowForge - AI Workflow Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container { max-width: 100%; padding: 20px; background: white; margin: 0; min-height: 100vh; }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px 20px; text-align: center; margin: -20px -20px 0 -20px;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; font-weight: 700; }
+        .nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
+        .nav-btn { 
+            padding: 12px 24px; background: #667eea; color: white; border: none;
+            border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.3s;
+        }
+        .nav-btn:hover { background: #5a6cf3; transform: translateY(-2px); }
+        .nav-btn.active { background: #4c1d95; }
+        .section { display: none; padding: 20px 0; }
+        .section.active { display: block; }
+        .card { 
+            background: #f8f9fa; border-radius: 12px; padding: 24px; margin: 20px 0;
+            border: 1px solid #e1e5e9; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .feature-card { 
+            padding: 20px; border: 2px solid #e1e5e9; border-radius: 12px; text-align: center;
+            transition: all 0.3s; cursor: pointer;
+        }
+        .feature-card:hover { border-color: #667eea; transform: translateY(-4px); }
+        .node { 
+            background: white; border: 2px solid #667eea; border-radius: 10px; padding: 16px;
+            margin: 10px; display: inline-block; min-width: 120px; text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: all 0.3s;
+        }
+        .node:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+        .workflow-builder { 
+            border: 2px dashed #ddd; border-radius: 12px; padding: 40px 20px;
+            text-align: center; min-height: 400px; display: flex; flex-direction: column;
+            justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #efefef2 100%);
+        }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+        .stat-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 20px; border-radius: 12px; text-align: center;
+        }
+        .stat-card .number { font-size: 2.5em; font-weight: bold; margin-bottom: 8px; }
+        .btn-primary { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 14px 28px; border-radius: 8px;
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin: 10px 0;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .workflow-list { margin: 20px 0; }
+        .workflow-item { 
+            background: white; border: 1px solid #e1e5e9; border-radius: 10px; padding: 20px;
+            margin: 16px 0; display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s;
+        }
+        .workflow-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .status.active { background: #d4edda; color: #155724; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; }
+        .ai-input { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+        .ai-input textarea { 
+            padding: 16px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 16px;
+            min-height: 120px; resize: vertical; font-family: inherit;
+        }
+        .ai-input textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25); }
+        .chart { 
+            background: white; border: 1px solid #e1e5e9; border-radius: 10px; padding: 24px;
+            margin: 20px 0; height: 300px; display: flex; align-items: center; justify-content: center;
+            color: #666; font-size: 18px;
+        }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .nav { flex-direction: column; align-items: center; }
+            .nav-btn { width: 200px; }
+            .workflow-item { flex-direction: column; gap: 16px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 FlowForge</h1>
+            <p>AI-Powered Workflow Automation Platform</p>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="showSection('builder')">🛠️ Builder</button>
+            <button class="nav-btn" onclick="showSection('ai-generator')">🤖 AI Generator</button>
+            <button class="nav-btn" onclick="showSection('analytics')">📈 Analytics</button>
+        </div>
+
+        <div id="dashboard" class="section active">
+            <div class="card">
+                <h3>📊 Workflow Dashboard</h3>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="number">247</div>
+                        <div class="label">Active Workflows</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">15.2K</div>
+                        <div class="label">Executions Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">99.7%</div>
+                        <div class="label">Success Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">2.3s</div>
+                        <div class="label">Avg Response</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🏃‍♂️ Active Workflows</h3>
+                <div class="workflow-list">
+                    <div class="workflow-item">
+                        <div class="info">
+                            <h3>Customer Onboarding</h3>
+                            <p>Automated welcome emails and account setup</p>
+                        </div>
+                        <div class="status active">Active</div>
+                    </div>
+                    <div class="workflow-item">
+                        <div class="info">
+                            <h3>Lead Qualification</h3>
+                            <p>AI-powered lead scoring and routing</p>
+                        </div>
+                        <div class="status active">Active</div>
+                    </div>
+                    <div class="workflow-item">
+                        <div class="info">
+                            <h3>Support Ticket Routing</h3>
+                            <p>Intelligent ticket categorization and assignment</p>
+                        </div>
+                        <div class="status active">Active</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="builder" class="section">
+            <div class="card">
+                <h3>🛠️ Visual Workflow Builder</h3>
+                <div class="workflow-builder">
+                    <h4>Drag & Drop Workflow Elements</h4>
+                    <div style="margin: 20px 0;">
+                        <div class="node">
+                            <div style="font-size: 2em;">⚡</div>
+                            <div style="font-weight: bold; color: #667eea;">Trigger</div>
+                        </div>
+                        <span style="font-size: 2em; color: #667eea;">→</span>
+                        <div class="node">
+                            <div style="font-size: 2em;">📧</div>
+                            <div style="font-weight: bold; color: #667eea;">Email</div>
+                        </div>
+                        <span style="font-size: 2em; color: #667eea;">→</span>
+                        <div class="node">
+                            <div style="font-size: 2em;">🤖</div>
+                            <div style="font-weight: bold; color: #667eea;">AI Agent</div>
+                        </div>
+                    </div>
+                    <p style="color: #666; margin-top: 20px;">Professional React Flow canvas with 13+ node types</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🎯 Available Node Types</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div style="font-size: 3em;">⚡</div>
+                        <h4>Smart Triggers</h4>
+                        <p>Schedule, webhook, email triggers</p>
+                    </div>
+                    <div class="feature-card">
+                        <div style="font-size: 3em;">🤖</div>
+                        <h4>AI Agents</h4>
+                        <p>GPT-4, Claude integration</p>
+                    </div>
+                    <div class="feature-card">
+                        <div style="font-size: 3em;">📊</div>
+                        <h4>CRM Actions</h4>
+                        <p>Salesforce, HubSpot sync</p>
+                    </div>
+                    <div class="feature-card">
+                        <div style="font-size: 3em;">📧</div>
+                        <h4>Email Actions</h4>
+                        <p>Send, template, tracking</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ai-generator" class="section">
+            <div class="card">
+                <h3>🤖 AI Workflow Generator</h3>
+                <p>Describe your workflow in natural language and our AI will build it for you.</p>
+                
+                <div class="ai-input">
+                    <textarea placeholder="Example: When a new customer signs up, send them a welcome email, wait 24 hours, then send them a getting started guide..."></textarea>
+                    <button class="btn-primary" onclick="generateWorkflow()">🚀 Generate Workflow</button>
+                </div>
+
+                <div id="ai-result" style="display: none;">
+                    <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                        <h4 style="color: #0369a1;">✨ Generated Workflow: Customer Onboarding</h4>
+                        <div style="margin: 15px 0;">
+                            <div class="node" style="margin: 5px;">
+                                <div style="font-size: 1.5em;">📧</div>
+                                <div>New Signup</div>
+                            </div>
+                            <span>→</span>
+                            <div class="node" style="margin: 5px;">
+                                <div style="font-size: 1.5em;">📧</div>
+                                <div>Welcome Email</div>
+                            </div>
+                            <span>→</span>
+                            <div class="node" style="margin: 5px;">
+                                <div style="font-size: 1.5em;">⏰</div>
+                                <div>24h Delay</div>
+                            </div>
+                            <span>→</span>
+                            <div class="node" style="margin: 5px;">
+                                <div style="font-size: 1.5em;">📖</div>
+                                <div>Guide Email</div>
+                            </div>
+                        </div>
+                        <p style="color: #0369a1;">✅ Workflow ready to deploy with 4 steps and AI-optimized timing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="analytics" class="section">
+            <div class="card">
+                <h3>📈 Real-Time Analytics</h3>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="number">8,247</div>
+                        <div class="label">Total Executions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">99.2%</div>
+                        <div class="label">Success Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">1.8s</div>
+                        <div class="label">Avg Duration</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">34</div>
+                        <div class="label">Active Users</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📊 Performance Trends</h3>
+                <div class="chart">
+                    📈 Interactive Charts: Execution trends, success rates, response times
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🏆 Top Performing Workflows</h3>
+                <div class="workflow-list">
+                    <div class="workflow-item">
+                        <div class="info">
+                            <h3>Email Campaign Automation</h3>
+                            <p>2,847 executions • 99.8% success</p>
+                        </div>
+                        <div class="status active">🔥 Hot</div>
+                    </div>
+                    <div class="workflow-item">
+                        <div class="info">
+                            <h3>Lead Scoring Pipeline</h3>
+                            <p>1,923 executions • 97.2% success</p>
+                        </div>
+                        <div class="status active">⭐ Top</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function generateWorkflow() {
+            const resultDiv = document.getElementById('ai-result');
+            resultDiv.style.display = 'block';
+            
+            // Simulate AI processing
+            const textarea = document.querySelector('textarea');
+            textarea.value = "✨ Processing your workflow...";
+            
+            setTimeout(() => {
+                textarea.value = "When a new customer signs up, send them a welcome email, wait 24 hours, then send them a getting started guide";
+            }, 1000);
+        }
+
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate numbers on load
+            const numbers = document.querySelectorAll('.stat-card .number');
+            numbers.forEach(num => {
+                const finalValue = num.textContent;
+                num.textContent = '0';
+                
+                setTimeout(() => {
+                    num.textContent = finalValue;
+                    num.style.transition = 'all 0.5s ease';
+                }, Math.random() * 1000);
+            });
+        });
+    </script>
+</body>
+</html>
