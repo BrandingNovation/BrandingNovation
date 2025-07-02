@@ -26,7 +26,7 @@ FlowForge is a visual AI workflow automation platform that empowers business use
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/flowforge.git
+git clone https://github.com/flowforge/flowforge.git
 cd flowforge
 
 # Install dependencies
