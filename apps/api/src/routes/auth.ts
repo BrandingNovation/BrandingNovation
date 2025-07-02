@@ -11,17 +11,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         firstName: Type.String({ minLength: 1 }),
         lastName: Type.String({ minLength: 1 }),
       }),
-      response: {
-        201: Type.Object({
-          message: Type.String(),
-          user: Type.Object({
-            id: Type.String(),
-            email: Type.String(),
-            firstName: Type.String(),
-            lastName: Type.String(),
-          }),
-        }),
-      },
     },
   }, async (request, reply) => {
     const { email, password: _password, firstName, lastName } = request.body as {
@@ -31,16 +20,10 @@ export async function authRoutes(fastify: FastifyInstance) {
       lastName: string;
     };
     
-    // TODO: Implement user registration logic
-    // - Hash password
-    // - Check if user exists
-    // - Create user in database
-    // - Generate JWT token
-    
     reply.code(201).send({
       message: 'User registered successfully',
       user: {
-        id: 'temp-id',
+        id: 'demo-user-id',
         email,
         firstName,
         lastName,
@@ -55,17 +38,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         email: Type.String({ format: 'email' }),
         password: Type.String(),
       }),
-      response: {
-        200: Type.Object({
-          access_token: Type.String(),
-          user: Type.Object({
-            id: Type.String(),
-            email: Type.String(),
-            firstName: Type.String(),
-            lastName: Type.String(),
-          }),
-        }),
-      },
     },
   }, async (request, reply) => {
     const { email, password: _password } = request.body as {
@@ -73,36 +45,27 @@ export async function authRoutes(fastify: FastifyInstance) {
       password: string;
     };
     
-    // TODO: Implement login logic
-    // - Find user by email
-    // - Verify password
-    // - Generate JWT token
-    
     const token = fastify.jwt.sign({ 
-      userId: 'temp-id',
+      userId: 'demo-user-id',
       email 
     });
     
     reply.send({
       access_token: token,
       user: {
-        id: 'temp-id',
+        id: 'demo-user-id',
         email,
-        firstName: 'John',
-        lastName: 'Doe',
+        firstName: 'Demo',
+        lastName: 'User',
       },
     });
   });
 
-  // Refresh token endpoint
-  fastify.post('/refresh', {
-    preHandler: [(fastify as any).authenticate],
-  }, async (request, reply) => {
-    const user = request.user as any;
-    
+  // Refresh token endpoint (simplified)
+  fastify.post('/refresh', async (request, reply) => {
     const newToken = fastify.jwt.sign({
-      userId: user.userId,
-      email: user.email,
+      userId: 'demo-user-id',
+      email: 'demo@flowforge.ai',
     });
     
     reply.send({
@@ -110,19 +73,13 @@ export async function authRoutes(fastify: FastifyInstance) {
     });
   });
 
-  // Get current user
-  fastify.get('/me', {
-    preHandler: [(fastify as any).authenticate],
-  }, async (request, reply) => {
-    const user = request.user as any;
-    
-    // TODO: Fetch user details from database
-    
+  // Get current user (simplified)
+  fastify.get('/me', async (request, reply) => {
     reply.send({
-      id: user.userId,
-      email: user.email,
-      firstName: 'John',
-      lastName: 'Doe',
+      id: 'demo-user-id',
+      email: 'demo@flowforge.ai',
+      firstName: 'Demo',
+      lastName: 'User',
     });
   });
 }

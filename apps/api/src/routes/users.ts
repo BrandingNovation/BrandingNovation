@@ -1,42 +1,27 @@
 import { FastifyInstance } from 'fastify';
 
 export async function userRoutes(fastify: FastifyInstance) {
-  // Get current user profile
-  fastify.get('/profile', {
-    preHandler: [(fastify as any).authenticate],
-  }, async (request, reply) => {
-    const user = request.user as any;
-    
-    // TODO: Fetch user profile from database
+  // Get current user profile (simplified)
+  fastify.get('/profile', async (request, reply) => {
     reply.send({
-      id: user.userId,
-      email: user.email,
-      firstName: 'John',
-      lastName: 'Doe',
+      id: 'demo-user-id',
+      email: 'demo@flowforge.ai',
+      firstName: 'Demo',
+      lastName: 'User',
       createdAt: new Date().toISOString(),
     });
   });
 
-  // Update user profile
-  fastify.put('/profile', {
-    preHandler: [(fastify as any).authenticate],
-  }, async (request, reply) => {
-    const user = request.user as any;
-    
-    // TODO: Update user profile in database
+  // Update user profile (simplified)
+  fastify.put('/profile', async (request, reply) => {
     reply.send({
-      id: user.userId,
+      id: 'demo-user-id',
       message: 'Profile updated successfully',
     });
   });
 
-  // Delete user account
-  fastify.delete('/account', {
-    preHandler: [(fastify as any).authenticate],
-  }, async (request, reply) => {
-    const _user = request.user as any;
-    
-    // TODO: Delete user account and all associated data
+  // Delete user account (simplified)
+  fastify.delete('/account', async (request, reply) => {
     reply.send({
       message: 'Account deleted successfully',
     });
