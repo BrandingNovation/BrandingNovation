@@ -107,11 +107,11 @@ server.get('/health', async () => {
   };
 });
 
-// Register middleware
-server.register(errorHandler);
-server.register(authMiddleware);
+// Register middleware first
+await server.register(errorHandler);
+await server.register(authMiddleware);
 
-// Register route modules
+// Register route modules after middleware
 await server.register(authRoutes, { prefix: '/api/auth' });
 await server.register(userRoutes, { prefix: '/api/users' });
 await server.register(workspaceRoutes, { prefix: '/api/workspaces' });
