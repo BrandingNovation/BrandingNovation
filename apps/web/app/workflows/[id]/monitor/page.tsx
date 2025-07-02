@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAPI, WorkflowExecution, workflowUtils } from '../../../../lib/api';
+import { demoApi } from '@/lib/api-demo';
 
 interface ExecutionStep {
   nodeId: string;
@@ -15,6 +16,14 @@ interface ExecutionStep {
   duration?: number;
   output?: any;
   error?: string;
+}
+
+// Generate static params for static export
+export async function generateStaticParams() {
+  const { workflows } = await demoApi.getWorkflows();
+  return workflows.map((workflow) => ({
+    id: workflow.id,
+  }));
 }
 
 export default function WorkflowMonitorPage() {

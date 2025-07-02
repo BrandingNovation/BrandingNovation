@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowForge - AI Workflow Automation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-border {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            padding: 2px;
+            border-radius: 12px;
+        }
+        .gradient-border-content {
+            background: white;
+            border-radius: 10px;
+            height: 100%;
+        }
+        .node-basic { border: 2px solid #3B82F6; background: #EFF6FF; }
+        .node-trigger { border: 2px solid #10B981; background: #ECFDF5; }
+        .node-email { border: 2px solid #F59E0B; background: #FFFBEB; }
+        .node-delay { border: 2px solid #8B5CF6; background: #F3E8FF; }
+        .node-condition { border: 2px solid #EF4444; background: #FEF2F2; }
+        .node-ai { border: 2px solid #EC4899; background: #FDF2F8; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Demo Data
+        const demoWorkflows = [
+            {
+                id: '1',
+                name: 'Customer Onboarding',
+                description: 'Automated customer onboarding with welcome emails and CRM integration',
+                status: 'active',
+                executions: 1247,
+                successRate: 98.2,
+                lastRun: '2 minutes ago'
+            },
+            {
+                id: '2',
+                name: 'Order Processing',
+                description: 'Complete order processing from payment to shipping',
+                status: 'active',
+                executions: 892,
+                successRate: 97.1,
+                lastRun: '5 minutes ago'
+            },
+            {
+                id: '3',
+                name: 'Lead Qualification',
+                description: 'AI-powered lead scoring and routing system',
+                status: 'active',
+                executions: 654,
+                successRate: 95.8,
+                lastRun: '8 minutes ago'
+            }
+        ];
+
+        const nodeTypes = [
+            { id: 'trigger', name: 'Trigger', icon: '⚡', description: 'Start your workflow', color: 'node-trigger' },
+            { id: 'email', name: 'Email', icon: '📧', description: 'Send emails', color: 'node-email' },
+            { id: 'delay', name: 'Delay', icon: '⏰', description: 'Wait for time', color: 'node-delay' },
+            { id: 'condition', name: 'Condition', icon: '🔀', description: 'If/then logic', color: 'node-condition' },
+            { id: 'ai', name: 'AI Agent', icon: '🤖', description: 'AI processing', color: 'node-ai' },
+            { id: 'basic', name: 'Action', icon: '⚙️', description: 'Custom action', color: 'node-basic' }
+        ];
+
+        // Main App Component
+        function App() {
+            const [currentPage, setCurrentPage] = useState('landing');
+            const [workflows, setWorkflows] = useState(demoWorkflows);
+
+            const renderPage = () => {
+                switch (currentPage) {
+                    case 'landing': return <LandingPage onNavigate={setCurrentPage} />;
+                    case 'workflows': return <WorkflowsPage workflows={workflows} onNavigate={setCurrentPage} />;
+                    case 'builder': return <WorkflowBuilder onNavigate={setCurrentPage} />;
+                    case 'generate': return <AIGeneratorPage onNavigate={setCurrentPage} />;
+                    case 'analytics': return <AnalyticsPage onNavigate={setCurrentPage} />;
+                    default: return <LandingPage onNavigate={setCurrentPage} />;
+                }
+            };
+
+            return <div className="min-h-screen bg-gray-50">{renderPage()}</div>;
+        }
+
+        // Landing Page Component
+        function LandingPage({ onNavigate }) {
+            return (
+                <div className="min-h-screen gradient-bg">
+                    <nav className="bg-white/10 backdrop-blur-md border-b border-white/20">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center h-16">
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center">
+                                        <span className="text-blue-600 font-bold text-lg">F</span>
+                                    </div>
+                                    <span className="text-xl font-bold text-white">FlowForge</span>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <button onClick={() => onNavigate('workflows')} className="text-white hover:text-blue-200">Workflows</button>
+                                    <button onClick={() => onNavigate('analytics')} className="text-white hover:text-blue-200">Analytics</button>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+                        <div className="text-center">
+                            <h1 className="text-5xl font-bold text-white mb-6">
+                                AI-Powered Workflow Automation
+                            </h1>
+                            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                                Build, deploy, and monitor intelligent workflows that automate your business processes. 
+                                No coding required - just describe what you want and our AI builds it for you.
+                            </p>
+                            <div className="flex justify-center space-x-4">
+                                <button 
+                                    onClick={() => onNavigate('generate')}
+                                    className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                                >
+                                    🤖 Generate with AI
+                                </button>
+                                <button 
+                                    onClick={() => onNavigate('builder')}
+                                    className="bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                                >
+                                    🛠️ Build Manually
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="gradient-border">
+                                <div className="gradient-border-content p-6">
+                                    <div className="text-3xl mb-4">🚀</div>
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">AI-Powered Generation</h3>
+                                    <p className="text-gray-600">Describe your workflow in plain English and watch our AI build it automatically.</p>
+                                </div>
+                            </div>
+                            <div className="gradient-border">
+                                <div className="gradient-border-content p-6">
+                                    <div className="text-3xl mb-4">⚡</div>
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Real-time Execution</h3>
+                                    <p className="text-gray-600">Monitor your workflows in real-time with live execution tracking and performance metrics.</p>
+                                </div>
+                            </div>
+                            <div className="gradient-border">
+                                <div className="gradient-border-content p-6">
+                                    <div className="text-3xl mb-4">📊</div>
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics</h3>
+                                    <p className="text-gray-600">Get insights into workflow performance with detailed analytics and optimization suggestions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Workflows Page Component
+        function WorkflowsPage({ workflows, onNavigate }) {
+            return (
+                <div>
+                    <Header onNavigate={onNavigate} />
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="flex justify-between items-center mb-8">
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900">Workflows</h1>
+                                <p className="text-gray-600">Manage and monitor your automated workflows</p>
+                            </div>
+                            <div className="flex space-x-3">
+                                <button 
+                                    onClick={() => onNavigate('generate')}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                                >
+                                    🤖 Generate with AI
+                                </button>
+                                <button 
+                                    onClick={() => onNavigate('builder')}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                                >
+                                    ➕ Create Workflow
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {workflows.map(workflow => (
+                                <div key={workflow.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-lg font-semibold text-gray-900">{workflow.name}</h3>
+                                        <span className={`px-2 py-1 text-xs rounded-full ${
+                                            workflow.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                        }`}>
+                                            {workflow.status}
+                                        </span>
+                                    </div>
+                                    <p className="text-gray-600 mb-4">{workflow.description}</p>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Executions:</span>
+                                            <span className="font-medium">{workflow.executions.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Success Rate:</span>
+                                            <span className="font-medium text-green-600">{workflow.successRate}%</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Last Run:</span>
+                                            <span className="font-medium">{workflow.lastRun}</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between">
+                                        <button 
+                                            onClick={() => onNavigate('builder')}
+                                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button className="text-green-600 hover:text-green-800 text-sm font-medium">
+                                            ▶️ Run
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Workflow Builder Component
+        function WorkflowBuilder({ onNavigate }) {
+            const [nodes, setNodes] = useState([]);
+            const [selectedNodeType, setSelectedNodeType] = useState(null);
+            const canvasRef = useRef(null);
+
+            const addNode = (type) => {
+                const newNode = {
+                    id: Date.now(),
+                    type: type.id,
+                    name: type.name,
+                    icon: type.icon,
+                    color: type.color,
+                    x: 100 + nodes.length * 200,
+                    y: 100
+                };
+                setNodes([...nodes, newNode]);
+            };
+
+            return (
+                <div>
+                    <Header onNavigate={onNavigate} />
+                    <div className="h-screen flex">
+                        {/* Node Library */}
+                        <div className="w-64 bg-white border-r border-gray-200 p-4">
+                            <h2 className="text-lg font-semibold text-gray-900 mb-4">Node Library</h2>
+                            <div className="space-y-2">
+                                {nodeTypes.map(type => (
+                                    <button
+                                        key={type.id}
+                                        onClick={() => addNode(type)}
+                                        className={`w-full p-3 rounded-lg border-2 text-left hover:shadow-md transition-all ${type.color}`}
+                                    >
+                                        <div className="flex items-center space-x-3">
+                                            <span className="text-xl">{type.icon}</span>
+                                            <div>
+                                                <div className="font-medium">{type.name}</div>
+                                                <div className="text-xs text-gray-600">{type.description}</div>
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Canvas */}
+                        <div className="flex-1 relative">
+                            <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-md">
+                                <div className="text-sm font-medium text-gray-900">Workflow Canvas</div>
+                                <div className="text-xs text-gray-500">Drag nodes from the library to build your workflow</div>
+                            </div>
+                            <svg 
+                                ref={canvasRef}
+                                className="w-full h-full bg-gray-50"
+                                style={{backgroundImage: 'radial-gradient(circle, #e5e7eb 1px, transparent 1px)', backgroundSize: '20px 20px'}}
+                            >
+                                {/* Grid pattern */}
+                                <defs>
+                                    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+                                    </pattern>
+                                </defs>
+                                <rect width="100%" height="100%" fill="url(#grid)" />
+                                
+                                {/* Connections between nodes */}
+                                {nodes.map((node, index) => (
+                                    index < nodes.length - 1 && (
+                                        <line
+                                            key={`connection-${index}`}
+                                            x1={node.x + 75}
+                                            y1={node.y + 25}
+                                            x2={nodes[index + 1].x + 75}
+                                            y2={nodes[index + 1].y + 25}
+                                            stroke="#3B82F6"
+                                            strokeWidth="2"
+                                            markerEnd="url(#arrowhead)"
+                                        />
+                                    )
+                                ))}
+                                
+                                {/* Arrow marker */}
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                                            refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#3B82F6" />
+                                    </marker>
+                                </defs>
+                            </svg>
+                            
+                            {/* Nodes */}
+                            {nodes.map(node => (
+                                <div
+                                    key={node.id}
+                                    className={`absolute bg-white rounded-lg p-3 border-2 shadow-md cursor-move ${node.color}`}
+                                    style={{ left: node.x, top: node.y, width: '150px' }}
+                                >
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-lg">{node.icon}</span>
+                                        <div>
+                                            <div className="font-medium text-sm">{node.name}</div>
+                                            <div className="text-xs text-gray-600">Node {node.id}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Properties Panel */}
+                        <div className="w-80 bg-white border-l border-gray-200 p-4">
+                            <h2 className="text-lg font-semibold text-gray-900 mb-4">Properties</h2>
+                            {nodes.length === 0 ? (
+                                <div className="text-center text-gray-500 py-8">
+                                    <div className="text-4xl mb-2">🎯</div>
+                                    <p>Add nodes to configure properties</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Workflow Name
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                            placeholder="My Awesome Workflow"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Description
+                                        </label>
+                                        <textarea 
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                            rows="3"
+                                            placeholder="Describe what this workflow does..."
+                                        />
+                                    </div>
+                                    <div className="pt-4">
+                                        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">
+                                            💾 Save Workflow
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // AI Generator Page Component
+        function AIGeneratorPage({ onNavigate }) {
+            const [prompt, setPrompt] = useState('');
+            const [isGenerating, setIsGenerating] = useState(false);
+            const [generatedWorkflow, setGeneratedWorkflow] = useState(null);
+
+            const generateWorkflow = async () => {
+                if (!prompt.trim()) return;
+                
+                setIsGenerating(true);
+                
+                // Simulate AI generation
+                setTimeout(() => {
+                    const workflows = {
+                        'onboarding': {
+                            name: 'Customer Onboarding Workflow',
+                            description: 'Automated customer onboarding with email sequences and CRM integration',
+                            steps: [
+                                '⚡ New Customer Signup',
+                                '📧 Send Welcome Email',
+                                '⏰ Wait 24 Hours',
+                                '🔀 Check Email Opened',
+                                '📧 Send Follow-up Email',
+                                '⚙️ Add to CRM'
+                            ],
+                            complexity: 'Medium',
+                            estimatedTime: '24-48 hours'
+                        },
+                        'order': {
+                            name: 'Order Processing Workflow',
+                            description: 'Complete order processing from payment to shipping',
+                            steps: [
+                                '⚡ New Order Received',
+                                '💳 Validate Payment',
+                                '📦 Update Inventory',
+                                '📧 Send Confirmation Email',
+                                '🚛 Create Shipping Label',
+                                '📱 Send Tracking Info'
+                            ],
+                            complexity: 'Medium',
+                            estimatedTime: '5-10 minutes'
+                        },
+                        'default': {
+                            name: 'Custom Workflow',
+                            description: 'Generated workflow based on your description',
+                            steps: [
+                                '⚡ Start Trigger',
+                                '🤖 AI Processing',
+                                '📧 Send Notification',
+                                '⚙️ Complete Action'
+                            ],
+                            complexity: 'Simple',
+                            estimatedTime: '2-5 minutes'
+                        }
+                    };
+
+                    const key = prompt.toLowerCase().includes('onboarding') ? 'onboarding' :
+                                prompt.toLowerCase().includes('order') ? 'order' : 'default';
+                    
+                    setGeneratedWorkflow(workflows[key]);
+                    setIsGenerating(false);
+                }, 2000);
+            };
+
+            return (
+                <div>
+                    <Header onNavigate={onNavigate} />
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="text-center mb-8">
+                            <h1 className="text-3xl font-bold text-gray-900 mb-4">🤖 AI Workflow Generator</h1>
+                            <p className="text-gray-600 max-w-2xl mx-auto">
+                                Describe your business process in plain English, and our AI will generate a complete workflow for you. 
+                                No technical knowledge required!
+                            </p>
+                        </div>
+
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Describe your workflow
+                            </label>
+                            <textarea
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                rows="4"
+                                placeholder="Example: Create a customer onboarding workflow that sends welcome emails and adds users to our CRM..."
+                            />
+                            <div className="mt-4 flex justify-between items-center">
+                                <div className="text-sm text-gray-500">
+                                    Try: "customer onboarding", "order processing", "lead qualification"
+                                </div>
+                                <button
+                                    onClick={generateWorkflow}
+                                    disabled={!prompt.trim() || isGenerating}
+                                    className={`px-6 py-2 rounded-md font-medium ${
+                                        !prompt.trim() || isGenerating
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                                    }`}
+                                >
+                                    {isGenerating ? '🔄 Generating...' : '✨ Generate Workflow'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {isGenerating && (
+                            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+                                <div className="animate-pulse">
+                                    <div className="text-4xl mb-4">🧠</div>
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">AI is thinking...</h3>
+                                    <p className="text-gray-600">Analyzing your requirements and generating an optimized workflow</p>
+                                    <div className="mt-4 flex justify-center space-x-2">
+                                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {generatedWorkflow && !isGenerating && (
+                            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-xl font-semibold text-gray-900">Generated Workflow</h2>
+                                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                                        ✅ Ready to use
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-medium text-gray-900 mb-2">{generatedWorkflow.name}</h3>
+                                        <p className="text-gray-600">{generatedWorkflow.description}</p>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-500 mb-1">Complexity</div>
+                                        <div className="font-medium">{generatedWorkflow.complexity}</div>
+                                        <div className="text-sm text-gray-500 mt-2 mb-1">Estimated Execution</div>
+                                        <div className="font-medium">{generatedWorkflow.estimatedTime}</div>
+                                    </div>
+                                    <div className="flex flex-col space-y-2">
+                                        <button 
+                                            onClick={() => onNavigate('builder')}
+                                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                                        >
+                                            📝 Edit in Builder
+                                        </button>
+                                        <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                                            💾 Save & Deploy
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-md font-medium text-gray-900 mb-3">Workflow Steps</h4>
+                                    <div className="space-y-3">
+                                        {generatedWorkflow.steps.map((step, index) => (
+                                            <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                                <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="text-gray-900">{step}</div>
+                                                {index < generatedWorkflow.steps.length - 1 && (
+                                                    <div className="flex-shrink-0 text-gray-400">→</div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Analytics Page Component
+        function AnalyticsPage({ onNavigate }) {
+            const [metrics] = useState({
+                totalWorkflows: 47,
+                activeWorkflows: 23,
+                totalExecutions: 12847,
+                successRate: 96.8,
+                avgExecutionTime: 2.4,
+                executionsToday: 234,
+                performanceMetrics: {
+                    cpu: 34,
+                    memory: 67,
+                    throughput: 47,
+                    errorRate: 3.2
+                },
+                topWorkflows: [
+                    { name: 'Customer Onboarding', executions: 1247, successRate: 98.2, avgTime: 1.8 },
+                    { name: 'Order Processing', executions: 892, successRate: 97.1, avgTime: 3.2 },
+                    { name: 'Lead Qualification', executions: 654, successRate: 95.8, avgTime: 4.1 }
+                ],
+                recentActivity: [
+                    { workflow: 'Customer Onboarding', action: 'Execution completed', timestamp: '2 minutes ago', status: 'success' },
+                    { workflow: 'Order Processing', action: 'Execution started', timestamp: '5 minutes ago', status: 'running' },
+                    { workflow: 'Lead Qualification', action: 'Execution failed', timestamp: '8 minutes ago', status: 'failed' }
+                ]
+            });
+
+            return (
+                <div>
+                    <Header onNavigate={onNavigate} />
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="mb-8">
+                            <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+                            <p className="text-gray-600">Real-time insights into your workflow performance</p>
+                        </div>
+
+                        {/* Key Metrics */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600">Total Workflows</p>
+                                        <p className="text-2xl font-bold text-gray-900">{metrics.totalWorkflows}</p>
+                                    </div>
+                                    <div className="text-3xl">📊</div>
+                                </div>
+                                <div className="mt-2">
+                                    <span className="text-green-600 text-sm">+12% from last month</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600">Total Executions</p>
+                                        <p className="text-2xl font-bold text-gray-900">{metrics.totalExecutions.toLocaleString()}</p>
+                                    </div>
+                                    <div className="text-3xl">⚡</div>
+                                </div>
+                                <div className="mt-2">
+                                    <span className="text-green-600 text-sm">+23% from last month</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600">Success Rate</p>
+                                        <p className="text-2xl font-bold text-gray-900">{metrics.successRate}%</p>
+                                    </div>
+                                    <div className="text-3xl">✅</div>
+                                </div>
+                                <div className="mt-2">
+                                    <span className="text-green-600 text-sm">+1.2% from last month</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600">Avg Execution Time</p>
+                                        <p className="text-2xl font-bold text-gray-900">{metrics.avgExecutionTime}s</p>
+                                    </div>
+                                    <div className="text-3xl">⏱️</div>
+                                </div>
+                                <div className="mt-2">
+                                    <span className="text-red-600 text-sm">+0.3s from last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* Top Performing Workflows */}
+                            <div className="bg-white rounded-lg border border-gray-200">
+                                <div className="px-6 py-4 border-b border-gray-200">
+                                    <h2 className="text-lg font-semibold text-gray-900">Top Performing Workflows</h2>
+                                </div>
+                                <div className="p-6">
+                                    <div className="space-y-4">
+                                        {metrics.topWorkflows.map((workflow, index) => (
+                                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div>
+                                                    <div className="font-medium text-gray-900">{workflow.name}</div>
+                                                    <div className="text-sm text-gray-600">
+                                                        {workflow.executions} executions • {workflow.successRate}% success
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-sm font-medium text-gray-900">{workflow.avgTime}s</div>
+                                                    <div className="text-xs text-gray-500">avg time</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Recent Activity */}
+                            <div className="bg-white rounded-lg border border-gray-200">
+                                <div className="px-6 py-4 border-b border-gray-200">
+                                    <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                                </div>
+                                <div className="p-6">
+                                    <div className="space-y-4">
+                                        {metrics.recentActivity.map((activity, index) => (
+                                            <div key={index} className="flex items-center space-x-3">
+                                                <div className={`w-2 h-2 rounded-full ${
+                                                    activity.status === 'success' ? 'bg-green-400' :
+                                                    activity.status === 'running' ? 'bg-blue-400 animate-pulse' :
+                                                    'bg-red-400'
+                                                }`} />
+                                                <div className="flex-1">
+                                                    <div className="text-sm font-medium text-gray-900">{activity.workflow}</div>
+                                                    <div className="text-sm text-gray-600">{activity.action}</div>
+                                                </div>
+                                                <div className="text-xs text-gray-500">{activity.timestamp}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Performance Metrics */}
+                        <div className="mt-8 bg-white rounded-lg border border-gray-200 p-6">
+                            <h2 className="text-lg font-semibold text-gray-900 mb-4">System Performance</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-sm text-gray-600">CPU Usage</span>
+                                        <span className="text-sm font-medium">{metrics.performanceMetrics.cpu}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-blue-600 h-2 rounded-full" style={{width: `${metrics.performanceMetrics.cpu}%`}}></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-sm text-gray-600">Memory</span>
+                                        <span className="text-sm font-medium">{metrics.performanceMetrics.memory}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-green-600 h-2 rounded-full" style={{width: `${metrics.performanceMetrics.memory}%`}}></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-sm text-gray-600">Throughput</span>
+                                        <span className="text-sm font-medium">{metrics.performanceMetrics.throughput}/min</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-purple-600 h-2 rounded-full" style={{width: `${metrics.performanceMetrics.throughput}%`}}></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-sm text-gray-600">Error Rate</span>
+                                        <span className="text-sm font-medium">{metrics.performanceMetrics.errorRate}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-red-600 h-2 rounded-full" style={{width: `${metrics.performanceMetrics.errorRate}%`}}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Header Component
+        function Header({ onNavigate }) {
+            return (
+                <header className="bg-white border-b border-gray-200">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-16">
+                            <div className="flex items-center space-x-4">
+                                <button onClick={() => onNavigate('landing')} className="flex items-center space-x-2">
+                                    <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                                        <span className="text-white font-bold text-lg">F</span>
+                                    </div>
+                                    <span className="text-xl font-bold text-gray-900">FlowForge</span>
+                                </button>
+                                <nav className="flex items-center space-x-6">
+                                    <button onClick={() => onNavigate('workflows')} className="text-gray-700 hover:text-blue-600">Workflows</button>
+                                    <button onClick={() => onNavigate('builder')} className="text-gray-700 hover:text-blue-600">Builder</button>
+                                    <button onClick={() => onNavigate('generate')} className="text-gray-700 hover:text-blue-600">AI Generate</button>
+                                    <button onClick={() => onNavigate('analytics')} className="text-gray-700 hover:text-blue-600">Analytics</button>
+                                </nav>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <span className="text-sm text-gray-600">Demo Mode</span>
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
