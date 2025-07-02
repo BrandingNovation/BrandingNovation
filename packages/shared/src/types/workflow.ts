@@ -147,7 +147,13 @@ export const WorkflowSchema = z.object({
     lastModified: z.string().datetime(),
     executionCount: z.number().default(0),
     averageExecutionTime: z.number().default(0),
-  }).default({}),
+  }).default(() => ({
+    version: '1.0.0',
+    tags: [],
+    lastModified: new Date().toISOString(),
+    executionCount: 0,
+    averageExecutionTime: 0,
+  })),
 });
 
 export type Workflow = z.infer<typeof WorkflowSchema>;
