@@ -1,0 +1,18 @@
+{
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "status": "pending_faucet",
+  "contract": "SystrumStore",
+  "address": null,
+  "split": { "artist_bps": 8500, "label_bps": 1500 },
+  "resaleRoyaltyBps": 1000,
+  "baseTokenURI": "ipfs://bafybeibax3qem7piuepgdl7373w4b5h6eo2cq5dhv2sxh66dbwh55a5yxy/metadata/",
+  "ykidrCid": "bafybeibax3qem7piuepgdl7373w4b5h6eo2cq5dhv2sxh66dbwh55a5yxy",
+  "tests": {
+    "forge": "7 passed (local anvil-style)",
+    "script_simulation": "DeployBaseSepolia.s.sol runs on chainId 84532; refuses other chains",
+    "onchain_broadcast": "blocked — public Base Sepolia faucets require mainnet ETH balance or login"
+  },
+  "deploy_command": "cd packages/systrum-store && forge script script/DeployBaseSepolia.s.sol:DeployBaseSepolia --rpc-url $BASE_SEPOLIA_RPC_URL --broadcast --private-key $DEPLOYER_PRIVATE_KEY",
+  "note": "No mainnet. Kenneth: fund a Sepolia deployer (or provide faucet ETH), set DEPLOYER_PRIVATE_KEY + ARTIST_WALLET + LABEL_WALLET, run deploy_command, then write the live address here."
+}

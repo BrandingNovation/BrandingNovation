@@ -1,0 +1,8 @@
+out/
+cache/
+broadcast/
+deployments/*.secrets.json
+deployments/fan-wallets.test.json
+.env
+.env.local
+node_modules/

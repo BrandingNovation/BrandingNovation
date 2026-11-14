@@ -1,0 +1,12 @@
+{
+  "album": "YKIDR",
+  "title": "Y'all Know I Don't Rap",
+  "artist": "Lil Bru",
+  "cid": "bafybeibax3qem7piuepgdl7373w4b5h6eo2cq5dhv2sxh66dbwh55a5yxy",
+  "uploaded_at": "2026-11-13T23:45:00.000Z",
+  "source": "https://usb.dmgdistro.com/audio/* + artwork",
+  "local_gateway": "http://127.0.0.1:8080/ipfs/bafybeibax3qem7piuepgdl7373w4b5h6eo2cq5dhv2sxh66dbwh55a5yxy",
+  "public_gateway": "https://ipfs.io/ipfs/bafybeibax3qem7piuepgdl7373w4b5h6eo2cq5dhv2sxh66dbwh55a5yxy",
+  "peer_id": "12D3KooWKgxiYcfbsLPiKxdFNEEEndFUHNzq3Q3DDS6saNEMokya",
+  "note": "Pinned on local Kubo v0.32.1 in the agent VM. Re-pin or use a pinning service for durability. Audio was present on the live USB host; not missing."
+}
