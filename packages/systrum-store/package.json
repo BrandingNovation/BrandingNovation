@@ -1,0 +1,25 @@
+{
+  "name": "@brandingnovation/systrum-store",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Systrum Store free/testnet slice — Base Sepolia ownership passes, IPFS album tooling, Stripe test checkout, custodial email wallets",
+  "type": "module",
+  "scripts": {
+    "build:contracts": "forge build",
+    "test:contracts": "forge test -vv",
+    "deploy:base-sepolia": "forge script script/DeployBaseSepolia.s.sol:DeployBaseSepolia --rpc-url ${BASE_SEPOLIA_RPC_URL:-https://sepolia.base.org} --broadcast",
+    "ipfs:upload": "node scripts/ipfs-upload.mjs",
+    "ipfs:doctor": "node scripts/ipfs-doctor.mjs",
+    "stripe:dev": "node src/stripe-server.mjs",
+    "wallet:demo": "node src/fan-wallet.mjs --demo",
+    "typecheck": "node -e \"console.log('systrum-store: ok')\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.4",
+    "express": "^4.21.2",
+    "stripe": "^17.5.0"
+  }
+}

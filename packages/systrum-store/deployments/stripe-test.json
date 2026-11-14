@@ -1,0 +1,26 @@
+{
+  "mode": "test",
+  "service": "packages/systrum-store/src/stripe-server.mjs",
+  "endpoints": [
+    "GET /health",
+    "POST /create-session",
+    "GET /go?p=<base64url JSON>",
+    "POST /webhook/stripe"
+  ],
+  "guards": {
+    "sk_live_refused": true,
+    "requires_sk_test_prefix": true
+  },
+  "usb_wiring": {
+    "prefer": "GET {origin}/checkout-api/go?p=...",
+    "live_host": "https://usb.dmgdistro.com",
+    "patch_file": "usb-app/paywall.js",
+    "sw_cache": "systrum-usb-v38-ykidr"
+  },
+  "secrets": [
+    "STRIPE_SECRET_KEY (sk_test_ only)",
+    "STRIPE_WEBHOOK_SECRET",
+    "FAN_WALLET_SECRET"
+  ],
+  "note": "Kenneth: add sk_test_ in Cursor Secrets / .env. Live Stripe blocked until he connects the live account."
+}
